@@ -1,0 +1,34 @@
+{
+  "name": "recoil-tools",
+  "version": "1.0.0",
+  "type": "module",
+  "source": "src/index.ts",
+  "exports": "./dist/index.modern.js",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.module.js",
+  "unpkg": "./dist/index.umd.js",
+  "scripts": {
+    "build": "microbundle",
+    "dev": "microbundle watch",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@testing-library/react-hooks": "^7.0.1",
+    "@types/jest": "^26.0.24",
+    "@types/react": "^17.0.15",
+    "jest": "^27.0.6",
+    "microbundle": "^0.13.3",
+    "prettier": "^2.3.2",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-test-renderer": "^17.0.2",
+    "recoil": "^0.4.0",
+    "ts-jest": "^27.0.4"
+  },
+  "peerDependencies": {
+    "recoil": "^0.4.0"
+  },
+  "prettier": {
+    "singleQuote": true
+  }
+}
