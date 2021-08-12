@@ -115,7 +115,7 @@ export const listAtom = <T, U>(
  *
  * @param recoilListState - Recoil List state.
  */
-export const useRecoilListState = <T, U>(
+export const useRecoilList = <T, U>(
   recoilListState: RecoilState<RecoilListState<T, U>>
 ): [RecoilListState<T, U>, RecoilListSetters<T, U>] => {
   const [state, setState] = useRecoilState(recoilListState);
@@ -326,7 +326,7 @@ export const useRecoilListMeta = <T>(
 export const useRecoilListSetters = <T, U>(
   recoilListState: RecoilState<RecoilListState<T, U>>
 ): RecoilListSetters<T, U> => {
-  const [, setters] = useRecoilListState<T, U>(recoilListState);
+  const [, setters] = useRecoilList<T, U>(recoilListState);
   return setters;
 };
 

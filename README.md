@@ -30,10 +30,10 @@ const userListState = listAtom<
 ###### Usage
 
 ```typescript jsx
-import { useRecoilListState } from 'recoil-tools';
+import { useRecoilList } from 'recoil-tools';
 
 function Users(): JSX.Element {
-  const [state, setters] = useRecoilListState(userListState);
+  const [state, setters] = useRecoilList(userListState);
 
   return (
     <ul>
@@ -202,10 +202,10 @@ const settingsDialogState = dialogAtom<{ isDarkMode: boolean }>({
 ###### Usage
 
 ```typescript jsx
-import { useRecoilListState } from 'recoil-tools';
+import { useRecoilList } from 'recoil-tools';
 
 function SettingsDialog(): JSX.Element {
-  const [state, setters] = useRecoilDialogState(settingsDialogState);
+  const [state, setters] = useRecoilDialog(settingsDialogState);
 
   return (
     <Dialog open={state.isOpen} onClose={setters.close}>

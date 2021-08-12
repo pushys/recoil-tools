@@ -1,7 +1,7 @@
 import React from 'react';
 import { RecoilRoot } from 'recoil';
 import { renderHook, act } from '@testing-library/react-hooks';
-import { dialogAtom, useRecoilDialogState } from './dialog';
+import { dialogAtom, useRecoilDialog } from './dialog';
 
 let key = 0;
 
@@ -22,7 +22,7 @@ describe('Recoil Dialog', () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <RecoilRoot>{children}</RecoilRoot>
     );
-    const { result } = renderHook(() => useRecoilDialogState(atom), {
+    const { result } = renderHook(() => useRecoilDialog(atom), {
       wrapper,
     });
 
@@ -48,7 +48,7 @@ describe('Recoil Dialog', () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <RecoilRoot>{children}</RecoilRoot>
     );
-    const { result } = renderHook(() => useRecoilDialogState(atom), {
+    const { result } = renderHook(() => useRecoilDialog(atom), {
       wrapper,
     });
 
@@ -74,7 +74,7 @@ describe('Recoil Dialog', () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <RecoilRoot>{children}</RecoilRoot>
     );
-    const { result } = renderHook(() => useRecoilDialogState(atom), {
+    const { result } = renderHook(() => useRecoilDialog(atom), {
       wrapper,
     });
 
@@ -100,7 +100,7 @@ describe('Recoil Dialog', () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <RecoilRoot>{children}</RecoilRoot>
     );
-    const { result } = renderHook(() => useRecoilDialogState(atom), {
+    const { result } = renderHook(() => useRecoilDialog(atom), {
       wrapper,
     });
 
@@ -126,7 +126,7 @@ describe('Recoil Dialog', () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <RecoilRoot>{children}</RecoilRoot>
     );
-    const { result } = renderHook(() => useRecoilDialogState(atom), {
+    const { result } = renderHook(() => useRecoilDialog(atom), {
       wrapper,
     });
 
@@ -152,7 +152,7 @@ describe('Recoil Dialog', () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <RecoilRoot>{children}</RecoilRoot>
     );
-    const { result } = renderHook(() => useRecoilDialogState(atom), {
+    const { result } = renderHook(() => useRecoilDialog(atom), {
       wrapper,
     });
 

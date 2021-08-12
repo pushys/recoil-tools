@@ -23,7 +23,7 @@ export type RecoilDialogState<T> = Readonly<{
 }>;
 
 /**
- * Result of the `useRecoilDialogState` hook.
+ * Result of the `useRecoilDialog` hook.
  */
 export type RecoilDialogSetters<T> = Readonly<{
   /**
@@ -69,7 +69,7 @@ export const dialogAtom = <T>(
  *
  * @param recoilDialogState - Recoil Dialog state.
  */
-export const useRecoilDialogState = <T>(
+export const useRecoilDialog = <T>(
   recoilDialogState: RecoilState<RecoilDialogState<T>>
 ): [RecoilDialogState<T>, RecoilDialogSetters<T>] => {
   const [state, setState] = useRecoilState(recoilDialogState);
@@ -166,6 +166,6 @@ export const useRecoilDialogMeta = <T>(
 export const useRecoilDialogSetters = <T>(
   recoilDialogState: RecoilState<RecoilDialogState<T>>
 ): RecoilDialogSetters<T> => {
-  const [, setters] = useRecoilDialogState<T>(recoilDialogState);
+  const [, setters] = useRecoilDialog<T>(recoilDialogState);
   return setters;
 };
