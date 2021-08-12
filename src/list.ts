@@ -47,6 +47,10 @@ export type RecoilListSetters<T, U> = Readonly<{
    */
   push: (...items: T[]) => void;
   /**
+   * Inserts a new item if predicate doesn't return `true`.
+   */
+  upsert: (predicate: (item: T, index: number) => boolean, newItem: T) => void;
+  /**
    * Updates an item at a particular index.
    */
   updateAt: (index: number, item: T) => void;
@@ -171,6 +175,21 @@ export const useRecoilList = <T, U>(
     [setState]
   );
 
+  const upsert = React.useCallback<RecoilListSetters<T, U>['upsert']>(
+    (predicate, newItem) =>
+      setState((prevState) => {
+        const index = prevState.data.findIndex(predicate);
+
+        if (index >= 0) return prevState;
+
+        return {
+          ...prevState,
+          data: prevState.data.concat([newItem]),
+        };
+      }),
+    [setState]
+  );
+
   const updateAt = React.useCallback<RecoilListSetters<T, U>['updateAt']>(
     (index, item) => {
       setState((prevState) => ({
@@ -191,7 +210,7 @@ export const useRecoilList = <T, U>(
           data: updateArrayItemAt(prevState.data, index, newItem),
         };
       }),
-    [setState, updateAt]
+    [setState]
   );
 
   const updateAll = React.useCallback<RecoilListSetters<T, U>['updateAll']>(
@@ -270,8 +289,9 @@ export const useRecoilList = <T, U>(
       setData,
       setMeta,
       clearData,
-      push,
       unshift,
+      push,
+      upsert,
       updateAt,
       update,
       updateAll,

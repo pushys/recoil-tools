@@ -138,6 +138,10 @@ type RecoilListSetters<T, U> = Readonly<{
    */
   push: (...items: T[]) => void;
   /**
+   * Inserts a new item if predicate doesn't return `true`.
+   */
+  upsert: (predicate: (item: T, index: number) => boolean, newItem: T) => void;
+  /**
    * Updates an item at a particular index.
    */
   updateAt: (index: number, item: T) => void;

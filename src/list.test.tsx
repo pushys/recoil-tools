@@ -130,6 +130,30 @@ describe('Recoil List', () => {
     });
   });
 
+  it('should unshift items', () => {
+    const atom = listAtom<number, undefined>({
+      key: `list${key}`,
+      default: {
+        data: [1, 2],
+        meta: undefined,
+      },
+    });
+
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <RecoilRoot>{children}</RecoilRoot>
+    );
+    const { result } = renderHook(() => useRecoilList(atom), { wrapper });
+
+    act(() => {
+      result.current[1].unshift(3, 4);
+    });
+
+    expect(result.current[0]).toMatchObject({
+      data: [3, 4, 1, 2],
+      meta: undefined,
+    });
+  });
+
   it('should push items', () => {
     const atom = listAtom<number, undefined>({
       key: `list${key}`,
@@ -154,11 +178,11 @@ describe('Recoil List', () => {
     });
   });
 
-  it('should unshift items', () => {
+  it('should push item if not exists', () => {
     const atom = listAtom<number, undefined>({
       key: `list${key}`,
       default: {
-        data: [1, 2],
+        data: [1, 2, 3],
         meta: undefined,
       },
     });
@@ -169,11 +193,35 @@ describe('Recoil List', () => {
     const { result } = renderHook(() => useRecoilList(atom), { wrapper });
 
     act(() => {
-      result.current[1].unshift(3, 4);
+      result.current[1].upsert((item) => item === 4, 4);
     });
 
     expect(result.current[0]).toMatchObject({
-      data: [3, 4, 1, 2],
+      data: [1, 2, 3, 4],
+      meta: undefined,
+    });
+  });
+
+  it('should not push item if already exists', () => {
+    const atom = listAtom<number, undefined>({
+      key: `list${key}`,
+      default: {
+        data: [1, 2, 3],
+        meta: undefined,
+      },
+    });
+
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <RecoilRoot>{children}</RecoilRoot>
+    );
+    const { result } = renderHook(() => useRecoilList(atom), { wrapper });
+
+    act(() => {
+      result.current[1].upsert((item) => item === 3, 3);
+    });
+
+    expect(result.current[0]).toMatchObject({
+      data: [1, 2, 3],
       meta: undefined,
     });
   });
