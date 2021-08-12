@@ -13,13 +13,14 @@ Created using `listAtom` function similarly to a regular Recoil atom, except lis
 ###### Creation
 
 ```typescript
+// atoms/listState.ts
 import { listAtom } from 'recoil-tools';
 
-const userListState = listAtom<
+export default listAtom<
   { id: string; email: string },
   { activeItemId: string | null }
 >({
-  key: 'userListState',
+  key: 'listState',
   default: {
     data: [],
     meta: { activeItemId: null },
@@ -31,9 +32,10 @@ const userListState = listAtom<
 
 ```typescript jsx
 import { useRecoilList } from 'recoil-tools';
+import listState from './atoms/listState';
 
 function Users(): JSX.Element {
-  const [state, setters] = useRecoilList(userListState);
+  const [state, setters] = useRecoilList(listState);
 
   return (
     <ul>
@@ -49,9 +51,10 @@ You can also use only list state's `data` property:
 
 ```typescript jsx
 import { useRecoilListData } from 'recoil-tools';
+import listState from './atoms/listState';
 
 function Users(): JSX.Element {
-  const users = useRecoilListData(userListState);
+  const users = useRecoilListData(listState);
 
   return (
     <ul>
@@ -67,9 +70,10 @@ Or only `meta` property:
 
 ```typescript jsx
 import { useRecoilListMeta } from 'recoil-tools';
+import listState from './atoms/listState';
 
-function Users(): JSX.Element {
-  const { activeUserId } = useRecoilListMeta(userListState);
+function ActiveUser(): JSX.Element {
+  const { activeUserId } = useRecoilListMeta(listState);
 
   return <div>Active user ID: {activeUserId}</div>;
 }
@@ -79,9 +83,10 @@ Or only state setters:
 
 ```typescript jsx
 import { useRecoilListSetters } from 'recoil-tools';
+import listState from './atoms/listState';
 
 function Users(): JSX.Element {
-  const { reverse } = useRecoilListSetters(userListState);
+  const { reverse } = useRecoilListSetters(listState);
 
   return (
     <div>
@@ -188,9 +193,10 @@ Created using `dialogAtom` function similarly to a regular Recoil atom, except d
 ###### Creation
 
 ```typescript
+// atoms/settingsDialogState.ts
 import { dialogAtom } from 'recoil-tools';
 
-const settingsDialogState = dialogAtom<{ isDarkMode: boolean }>({
+export default dialogAtom<{ isDarkMode: boolean }>({
   key: 'settingsDialogState',
   default: {
     isOpen: false,
@@ -202,7 +208,8 @@ const settingsDialogState = dialogAtom<{ isDarkMode: boolean }>({
 ###### Usage
 
 ```typescript jsx
-import { useRecoilList } from 'recoil-tools';
+import { useRecoilDialog } from 'recoil-tools';
+import settingsDialogState from './atoms/settingsDialogState';
 
 function SettingsDialog(): JSX.Element {
   const [state, setters] = useRecoilDialog(settingsDialogState);
@@ -219,6 +226,7 @@ You can also use only dialog state's `isOpen` property:
 
 ```typescript jsx
 import { useRecoilDialogIsOpen } from 'recoil-tools';
+import settingsDialogState from './atoms/settingsDialogState';
 
 function SettingsDialog(): JSX.Element {
   const isOpen = useRecoilDialogIsOpen(settingsDialogState);
@@ -233,6 +241,7 @@ Or only `meta` property:
 
 ```typescript jsx
 import { useRecoilDialogMeta } from 'recoil-tools';
+import settingsDialogState from './atoms/settingsDialogState';
 
 function Anywhere(): JSX.Element {
   const { isDarkMode } = useRecoilDialogMeta(settingsDialogState);
@@ -244,14 +253,15 @@ function Anywhere(): JSX.Element {
 Or only state setters:
 
 ```typescript jsx
-import { useRecoilListSetters } from 'recoil-tools';
+import { useRecoilDialogSetters } from 'recoil-tools';
+import settingsDialogState from './atoms/settingsDialogState';
 
-function Users(): JSX.Element {
-  const { reverse } = useRecoilListSetters(userListState);
+function Anywhere(): JSX.Element {
+  const { open } = useRecoilDialogSetters(userListState);
 
   return (
     <div>
-      <button onClick={reverse}>Reverse items</button>
+      <button onClick={open}>Open dialog</button>
     </div>
   );
 }
