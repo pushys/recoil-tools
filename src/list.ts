@@ -17,7 +17,7 @@ export type RecoilListState<T, U> = Readonly<{
    */
   data: T[];
   /**
-   * Any meta data related to the list.
+   * Any metadata related to the list.
    */
   meta: U;
 }>;
@@ -46,6 +46,11 @@ export type RecoilListSetters<T, U> = Readonly<{
    * Inserts an arbitrary number of items at the end of the list.
    */
   push: (...items: T[]) => void;
+  /**
+   * Clears list and inserts an arbitrary number of items.
+   * Basically a combination of `clearData` and `push`.
+   */
+  clearPush: (...items: T[]) => void;
   /**
    * Inserts a new item if predicate doesn't return `true`.
    */
@@ -175,6 +180,15 @@ export const useRecoilList = <T, U>(
     [setState]
   );
 
+  const clearPush = React.useCallback<RecoilListSetters<T, U>['clearPush']>(
+    (...data) =>
+      setState((prevState) => ({
+        ...prevState,
+        data,
+      })),
+    [setState]
+  );
+
   const upsert = React.useCallback<RecoilListSetters<T, U>['upsert']>(
     (predicate, newItem) =>
       setState((prevState) => {
@@ -291,6 +305,7 @@ export const useRecoilList = <T, U>(
       clearData,
       unshift,
       push,
+      clearPush,
       upsert,
       updateAt,
       update,

@@ -88,6 +88,32 @@ describe('Recoil Dialog', () => {
     });
   });
 
+  it('should set open state to `true` and `meta` property', () => {
+    const atom = dialogAtom<number>({
+      key: `dialog${key}`,
+      default: {
+        isOpen: false,
+        meta: 51,
+      },
+    });
+
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <RecoilRoot>{children}</RecoilRoot>
+    );
+    const { result } = renderHook(() => useRecoilDialog(atom), {
+      wrapper,
+    });
+
+    act(() => {
+      result.current[1].open(64);
+    });
+
+    expect(result.current[0]).toMatchObject({
+      isOpen: true,
+      meta: 64,
+    });
+  });
+
   it('should set open state to `false`', () => {
     const atom = dialogAtom<undefined>({
       key: `dialog${key}`,

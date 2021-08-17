@@ -17,7 +17,7 @@ export type RecoilDialogState<T> = Readonly<{
    */
   isOpen: boolean;
   /**
-   * Any meta data related to the dialog.
+   * Any metadata related to the dialog.
    */
   meta: T;
 }>;
@@ -31,9 +31,9 @@ export type RecoilDialogSetters<T> = Readonly<{
    */
   setOpen: SetterOrUpdater<boolean>;
   /**
-   * Sets `isOpen` state to `true`.
+   * Sets `isOpen` state to `true` Also supports setting `meta` property.
    */
-  open: () => void;
+  open: (meta?: T) => void;
   /**
    * Sets `isOpen` state to `false`.
    */
@@ -87,12 +87,16 @@ export const useRecoilDialog = <T>(
     [setState]
   );
 
-  const open = React.useCallback<RecoilDialogSetters<T>['open']>(() => {
-    setState((prevState) => ({
-      ...prevState,
-      isOpen: true,
-    }));
-  }, [setState]);
+  const open = React.useCallback<RecoilDialogSetters<T>['open']>(
+    (meta) => {
+      setState((prevState) => ({
+        ...prevState,
+        ...(meta !== undefined && { meta }),
+        isOpen: true,
+      }));
+    },
+    [setState]
+  );
 
   const close = React.useCallback<RecoilDialogSetters<T>['close']>(() => {
     setState((prevState) => ({

@@ -1,6 +1,15 @@
 # Recoil Tools
 
-Custom Recoil atoms and hooks with predefined state structure for different types of data.
+Custom [Recoil](https://recoiljs.org) atoms and hooks for basic application needs. All atoms are wrappers around native Recoil's `atom` function,
+except the custom ones enforce particular data structure depending on the atom type.
+
+## Installation
+
+`npm i recoil-tools`
+
+or
+
+`yarn add recoil-tools`
 
 ## List
 
@@ -8,9 +17,7 @@ Used for organizing and managing data in a list format.
 
 ### Creation and Usage
 
-Created using `listAtom` function similarly to a regular Recoil atom, except list enforces its own state structure.
-
-###### Creation
+Created using `listAtom`. The state has two properties: `data` (array of list items) and `meta` (anything related to the list, i.e. current active item ID, pending item ID etc.).
 
 ```typescript
 // atoms/listState.ts
@@ -28,7 +35,7 @@ export default listAtom<
 });
 ```
 
-###### Usage
+Access to the list state and setters is provided through `useRecoilList` hook.
 
 ```typescript jsx
 import { useRecoilList } from 'recoil-tools';
@@ -47,7 +54,7 @@ function Users(): JSX.Element {
 }
 ```
 
-You can also use only list state's `data` property:
+You can also use only state's `data` property:
 
 ```typescript jsx
 import { useRecoilListData } from 'recoil-tools';
@@ -107,7 +114,7 @@ type RecoilListState<T, U> = Readonly<{
    */
   data: T[];
   /**
-   * Any meta data related to the list.
+   * Any metadata related to the list.
    */
   meta: U;
 }>;
@@ -137,6 +144,11 @@ type RecoilListSetters<T, U> = Readonly<{
    * Inserts an arbitrary number of items at the end of the list.
    */
   push: (...items: T[]) => void;
+  /**
+   * Clears list and inserts an arbitrary number of items.
+   * Basically a combination of `clearData` and `push`.
+   */
+  clearPush: (...items: T[]) => void;
   /**
    * Inserts a new item if predicate doesn't return `true`.
    */
@@ -188,13 +200,11 @@ type RecoilListSetters<T, U> = Readonly<{
 
 ## Dialog
 
-Used for storing state of modal windows and dialogs.
+Useful for managing state of global dialog windows like app theme, language, settings or confirmation dialog.
 
 ### Creation and Usage
 
-Created using `dialogAtom` function similarly to a regular Recoil atom, except dialog enforces its own state structure.
-
-###### Creation
+Created using `dialogAtom`. The state has two properties: `isOpen` (dialog open status) and `meta` (any metadata related to the dialog).
 
 ```typescript
 // atoms/settingsDialogState.ts
@@ -209,7 +219,7 @@ export default dialogAtom<{ isDarkMode: boolean }>({
 });
 ```
 
-###### Usage
+Access to the dialog state and setters is provided through `useRecoilDialog` hook.
 
 ```typescript jsx
 import { useRecoilDialog } from 'recoil-tools';
@@ -226,7 +236,7 @@ function SettingsDialog(): JSX.Element {
 }
 ```
 
-You can also use only dialog state's `isOpen` property:
+You can also use only state's `isOpen` property:
 
 ```typescript jsx
 import { useRecoilDialogIsOpen } from 'recoil-tools';
@@ -235,9 +245,7 @@ import settingsDialogState from './atoms/settingsDialogState';
 function SettingsDialog(): JSX.Element {
   const isOpen = useRecoilDialogIsOpen(settingsDialogState);
 
-  return (
-    <Dialog open={isOpen} {...props} />
-  );
+  return <Dialog open={isOpen} {...props} />;
 }
 ```
 
@@ -282,7 +290,7 @@ type RecoilDialogState<T> = Readonly<{
    */
   isOpen: boolean;
   /**
-   * Any meta data related to the dialog.
+   * Any metadata related to the dialog.
    */
   meta: T;
 }>;
@@ -297,9 +305,9 @@ type RecoilDialogSetters<T> = Readonly<{
    */
   setOpen: SetterOrUpdater<boolean>;
   /**
-   * Sets `isOpen` state to `true`.
+   * Sets `isOpen` state to `true` Also supports setting `meta` property.
    */
-  open: () => void;
+  open: (meta?: T) => void;
   /**
    * Sets `isOpen` state to `false`.
    */

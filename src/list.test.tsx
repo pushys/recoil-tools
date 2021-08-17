@@ -97,12 +97,12 @@ describe('Recoil List', () => {
     const { result } = renderHook(() => useRecoilList(atom), { wrapper });
 
     act(() => {
-      result.current[1].setMeta('meta data');
+      result.current[1].setMeta('metadata');
     });
 
     expect(result.current[0]).toMatchObject({
       data: [],
-      meta: 'meta data',
+      meta: 'metadata',
     });
   });
 
@@ -121,12 +121,12 @@ describe('Recoil List', () => {
     const { result } = renderHook(() => useRecoilList(atom), { wrapper });
 
     act(() => {
-      result.current[1].setMeta((prevMeta) => `${prevMeta} data`);
+      result.current[1].setMeta((prevMeta) => `${prevMeta}data`);
     });
 
     expect(result.current[0]).toMatchObject({
       data: [],
-      meta: 'meta data',
+      meta: 'metadata',
     });
   });
 
@@ -174,6 +174,30 @@ describe('Recoil List', () => {
 
     expect(result.current[0]).toMatchObject({
       data: [1, 2, 3, 4],
+      meta: undefined,
+    });
+  });
+
+  it('should clear and push items', () => {
+    const atom = listAtom<number, undefined>({
+      key: `list${key}`,
+      default: {
+        data: [1, 2, 3],
+        meta: undefined,
+      },
+    });
+
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <RecoilRoot>{children}</RecoilRoot>
+    );
+    const { result } = renderHook(() => useRecoilList(atom), { wrapper });
+
+    act(() => {
+      result.current[1].clearPush(4, 5, 6);
+    });
+
+    expect(result.current[0]).toMatchObject({
+      data: [4, 5, 6],
       meta: undefined,
     });
   });
