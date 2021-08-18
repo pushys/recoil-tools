@@ -174,7 +174,7 @@ export const useRecoilFiltersIsApplied = <T extends Record<string, any>>(
  * @param recoilFiltersState - Recoil Filters state.
  *
  * @example
- * const meta = useRecoilFiltersValues(filtersState);
+ * const values = useRecoilFiltersValues(filtersState);
  */
 export const useRecoilFiltersValues = <T extends Record<string, any>>(
   recoilFiltersState: RecoilState<RecoilFiltersState<T>>

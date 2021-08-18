@@ -336,6 +336,17 @@ function App() {
 }
 ```
 
+Or only `values` property:
+
+```typescript jsx
+import { useRecoilFiltersValues } from 'recoil-tools';
+import filtersState from './atoms/filtersState';
+
+function App() {
+  const values = useRecoilFiltersValues(filtersState);
+}
+```
+
 Or only state setters:
 
 ```typescript jsx

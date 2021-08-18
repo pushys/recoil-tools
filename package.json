@@ -2,6 +2,8 @@
   "name": "recoil-tools",
   "version": "1.0.0",
   "license": "MIT",
+  "repository": "https://github.com/pushys/recoil-tools",
+  "author": "Eugene Dyakonov <evgeny.dknv@gmail.com>",
   "type": "module",
   "source": "src/index.ts",
   "exports": "./dist/index.modern.js",
