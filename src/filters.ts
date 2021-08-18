@@ -56,7 +56,7 @@ export type RecoilFiltersSetters<T extends Record<string, any>> = Readonly<{
 /**
  * Recoil Filters atom.
  *
- * @param options - Dialog atom options.
+ * @param options - Filters atom options.
  *
  * @example
  * const filtersState = filtersAtom({

@@ -1,7 +1,9 @@
 # Recoil Tools
 
 Custom [Recoil](https://recoiljs.org) atoms and hooks for basic application needs. All atoms are wrappers around native Recoil's `atom` function,
-except the custom ones enforce particular data structure depending on the atom type.
+so they enforce particular data structure depending on the atom type.
+
+This library only includes static atoms for data storage, no asynchronous logic is involved.
 
 ## Installation
 
