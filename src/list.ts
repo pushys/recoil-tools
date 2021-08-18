@@ -7,6 +7,7 @@ import {
   useRecoilValue,
   SetterOrUpdater,
 } from 'recoil';
+import { executeUpdater } from './utils';
 
 /**
  * Recoil List state.
@@ -23,7 +24,7 @@ export type RecoilListState<T, U> = Readonly<{
 }>;
 
 /**
- * Result of the `useListRecoilState` hook.
+ * List state setters.
  */
 export type RecoilListSetters<T, U> = Readonly<{
   /**
@@ -133,10 +134,7 @@ export const useRecoilList = <T, U>(
     (valOrUpdater) => {
       setState((prevState) => ({
         ...prevState,
-        data:
-          typeof valOrUpdater === 'function'
-            ? valOrUpdater(prevState.data)
-            : valOrUpdater,
+        data: executeUpdater(valOrUpdater, prevState.data),
       }));
     },
     [setState]
@@ -146,10 +144,7 @@ export const useRecoilList = <T, U>(
     (valOrUpdater) => {
       setState((prevState) => ({
         ...prevState,
-        meta:
-          typeof valOrUpdater === 'function'
-            ? (valOrUpdater as Function)(prevState.meta)
-            : valOrUpdater,
+        meta: executeUpdater(valOrUpdater, prevState.meta),
       }));
     },
     [setState]

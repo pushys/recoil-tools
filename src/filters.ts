@@ -7,6 +7,7 @@ import {
   useRecoilValue,
   SetterOrUpdater,
 } from 'recoil';
+import { executeUpdater } from './utils';
 
 /**
  * Recoil Filters state.
@@ -27,7 +28,7 @@ export type RecoilFiltersState<T extends Record<string, any>> = Readonly<{
 }>;
 
 /**
- * Result of the `useRecoilFilters` hook.
+ * Filters state setters.
  */
 export type RecoilFiltersSetters<T extends Record<string, any>> = Readonly<{
   /**
@@ -88,10 +89,7 @@ export const useRecoilFilters = <T extends Record<string, any>>(
     (valOrUpdater) => {
       setState((prevState) => ({
         ...prevState,
-        isOpen:
-          typeof valOrUpdater === 'function'
-            ? valOrUpdater(prevState.isOpen)
-            : valOrUpdater,
+        isOpen: executeUpdater(valOrUpdater, prevState.isOpen),
       }));
     },
     [setState]
@@ -101,10 +99,7 @@ export const useRecoilFilters = <T extends Record<string, any>>(
     (valOrUpdater) => {
       setState((prevState) => ({
         ...prevState,
-        isApplied:
-          typeof valOrUpdater === 'function'
-            ? valOrUpdater(prevState.isApplied)
-            : valOrUpdater,
+        isApplied: executeUpdater(valOrUpdater, prevState.isApplied),
       }));
     },
     [setState]
@@ -125,10 +120,7 @@ export const useRecoilFilters = <T extends Record<string, any>>(
       setState((prevState) => ({
         ...prevState,
         isApplied: true,
-        values:
-          typeof valOrUpdater === 'function'
-            ? (valOrUpdater as Function)(prevState.values)
-            : valOrUpdater,
+        values: executeUpdater(valOrUpdater, prevState.values),
       }));
     },
     [setState]

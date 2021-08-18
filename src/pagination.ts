@@ -26,7 +26,7 @@ export type RecoilPaginationState<T> = Readonly<{
   limit: number;
   /**
    * Automatically calculated property based on `page` and `limit`
-   * that shows current offset in records number.
+   * that shows current offset in records.
    */
   offset: number;
   /**
@@ -36,7 +36,7 @@ export type RecoilPaginationState<T> = Readonly<{
 }>;
 
 /**
- * Result of the `useRecoilPagination` hook.
+ * Pagination state setters.
  */
 export type RecoilPaginationSetters<T> = Readonly<{
   /**

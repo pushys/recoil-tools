@@ -7,6 +7,7 @@ import {
   useRecoilValue,
   SetterOrUpdater,
 } from 'recoil';
+import { executeUpdater } from './utils';
 
 /**
  * Recoil Dialog state.
@@ -23,7 +24,7 @@ export type RecoilDialogState<T> = Readonly<{
 }>;
 
 /**
- * Result of the `useRecoilDialog` hook.
+ * Dialog state setters.
  */
 export type RecoilDialogSetters<T> = Readonly<{
   /**
@@ -78,10 +79,7 @@ export const useRecoilDialog = <T>(
     (valOrUpdater) => {
       setState((prevState) => ({
         ...prevState,
-        isOpen:
-          typeof valOrUpdater === 'function'
-            ? valOrUpdater(prevState.isOpen)
-            : valOrUpdater,
+        isOpen: executeUpdater(valOrUpdater, prevState.isOpen),
       }));
     },
     [setState]
@@ -109,10 +107,7 @@ export const useRecoilDialog = <T>(
     (valOrUpdater) => {
       setState((prevState) => ({
         ...prevState,
-        meta:
-          typeof valOrUpdater === 'function'
-            ? (valOrUpdater as any)(prevState.meta)
-            : valOrUpdater,
+        meta: executeUpdater(valOrUpdater, prevState.meta),
       }));
     },
     [setState]

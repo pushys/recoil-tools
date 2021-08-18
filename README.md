@@ -19,7 +19,7 @@ Useful for organizing and managing data in a list format.
 
 ### Creation and Usage
 
-Created using `listAtom`. The state has two properties: `data` (array of list items) and `meta` (anything related to the list, i.e. current active item ID, pending item ID etc.).
+Created using `listAtom`.
 
 ```typescript
 // atoms/listState.ts
@@ -182,7 +182,7 @@ Useful for managing state of global dialog windows like app theme, language, set
 
 ### Creation and Usage
 
-Created using `dialogAtom`. The state has two properties: `isOpen` (dialog open status) and `meta` (any metadata related to the dialog).
+Created using `dialogAtom`.
 
 ```typescript
 // atoms/dialogState.ts
@@ -393,5 +393,104 @@ type RecoilFiltersSetters<T extends Record<string, any>> = Readonly<{
    * and `isApplied` property to `true`.
    */
   apply: SetterOrUpdater<T>;
+}>;
+```
+
+## Pagination
+
+Static storage of pagination state.
+
+### Creation and Usage
+
+Created using `paginationAtom`.
+
+```typescript
+// atoms/paginationState.ts
+import { paginationAtom } from 'recoil-tools';
+
+export default paginationAtom({
+  key: 'paginationState',
+  default: {
+    total: 0,
+    page: 1,
+    limit: 10,
+    offset: 0,
+    meta: undefined,
+  },
+});
+```
+
+Access to the pagination state and setters is provided through `useRecoilPagination` hook.
+
+```typescript jsx
+import { useRecoilPagination } from 'recoil-tools';
+import paginationState from './atoms/paginationState';
+
+function App() {
+  const [state, setters] = useRecoilPagination(paginationState);
+}
+```
+
+You can also use only state setters:
+
+```typescript jsx
+import { useRecoilPaginationSetters } from 'recoil-tools';
+import paginationState from './atoms/paginationState';
+
+function App() {
+  const { setPage, setLimit } = useRecoilPaginationSetters(paginationState);
+}
+```
+
+### API Reference
+
+#### State
+
+```typescript
+type RecoilPaginationState<T> = Readonly<{
+  /**
+   * Total number of records.
+   */
+  total: number;
+  /**
+   * Current page number.
+   */
+  page: number;
+  /**
+   * Number of records per page.
+   */
+  limit: number;
+  /**
+   * Automatically calculated property based on `page` and `limit`
+   * that shows current offset in records.
+   */
+  offset: number;
+  /**
+   * Any metadata related to the pagination.
+   */
+  meta: T;
+}>;
+```
+
+#### Setters
+
+```typescript
+type RecoilPaginationSetters<T> = Readonly<{
+  /**
+   * `total` property setter.
+   */
+  setTotal: SetterOrUpdater<number>;
+  /**
+   * `page` property setter.
+   */
+  setPage: SetterOrUpdater<number>;
+  /**
+   * `limit` property setter.
+   */
+  setLimit: SetterOrUpdater<number>;
+  /**
+   * `meta` property setter.
+   */
+  setMeta: SetterOrUpdater<T>;
 }>;
 ```
