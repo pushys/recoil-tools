@@ -127,7 +127,7 @@ export const useRecoilFilters = <T extends Record<string, any>>(
         isApplied: true,
         values:
           typeof valOrUpdater === 'function'
-            ? valOrUpdater(prevState.values)
+            ? (valOrUpdater as Function)(prevState.values)
             : valOrUpdater,
       }));
     },

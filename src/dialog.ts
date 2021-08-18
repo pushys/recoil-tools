@@ -27,11 +27,11 @@ export type RecoilDialogState<T> = Readonly<{
  */
 export type RecoilDialogSetters<T> = Readonly<{
   /**
-   * Sets `isOpen` state.
+   * `isOpen` property setter.
    */
   setOpen: SetterOrUpdater<boolean>;
   /**
-   * Sets `isOpen` state to `true` Also supports setting `meta` property.
+   * Sets `isOpen` state to `true`. Also supports setting `meta` property.
    */
   open: (meta?: T) => void;
   /**
@@ -39,7 +39,7 @@ export type RecoilDialogSetters<T> = Readonly<{
    */
   close: () => void;
   /**
-   * Sets `meta` property.
+   * `meta` property setter.
    */
   setMeta: SetterOrUpdater<T>;
 }>;

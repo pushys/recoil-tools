@@ -27,7 +27,7 @@ export type RecoilListState<T, U> = Readonly<{
  */
 export type RecoilListSetters<T, U> = Readonly<{
   /**
-   * Sets `data` property.
+   * `data` property setter.
    */
   setData: SetterOrUpdater<T[]>;
   /**
@@ -35,7 +35,7 @@ export type RecoilListSetters<T, U> = Readonly<{
    */
   clearData: () => void;
   /**
-   * Sets `meta` property.
+   * `meta` property setter.
    */
   setMeta: SetterOrUpdater<U>;
   /**
@@ -94,7 +94,7 @@ export type RecoilListSetters<T, U> = Readonly<{
    */
   sort: (compareFn?: (a: T, b: T) => number) => void;
   /**
-   * Reverse order of list items.
+   * Works like native `Array.reverse`.
    */
   reverse: () => void;
 }>;
@@ -148,7 +148,7 @@ export const useRecoilList = <T, U>(
         ...prevState,
         meta:
           typeof valOrUpdater === 'function'
-            ? (valOrUpdater as any)(prevState.meta)
+            ? (valOrUpdater as Function)(prevState.meta)
             : valOrUpdater,
       }));
     },
