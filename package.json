@@ -1,14 +1,24 @@
 {
   "name": "recoil-tools",
   "version": "1.0.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/pushys/recoil-tools.git"
+  },
+  "author": "Eugene Dyakonov <evgeny.dknv@gmail.com>",
   "type": "module",
   "source": "src/index.ts",
   "exports": "./dist/index.modern.js",
   "main": "./dist/index.cjs",
   "module": "./dist/index.module.js",
   "unpkg": "./dist/index.umd.js",
+  "typings": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "microbundle",
+    "build": "jest & microbundle",
     "dev": "microbundle watch",
     "test": "jest"
   },
@@ -26,7 +36,8 @@
     "ts-jest": "^27.0.4"
   },
   "peerDependencies": {
-    "recoil": "^0.4.0"
+    "recoil": "^0.4.0",
+    "react": "^17.0.2"
   },
   "prettier": {
     "singleQuote": true

@@ -1,25 +1,35 @@
 # Recoil Tools
 
-Custom Recoil atoms and hooks with predefined state structure for different types of data.
+Custom [Recoil](https://recoiljs.org) atoms and hooks for basic application needs. All atoms are wrappers around native Recoil's `atom` function,
+so they enforce particular data structure depending on the atom type.
+
+This library only includes static atoms for data storage, no asynchronous logic is involved.
+
+## Installation
+
+`npm i recoil-tools`
+
+or
+
+`yarn add recoil-tools`
 
 ## List
 
-Used for organizing and managing data in a list format.
+Useful for organizing and managing data in a list format.
 
 ### Creation and Usage
 
-Created using `listAtom` function similarly to a regular Recoil atom, except list enforces its own state structure.
-
-###### Creation
+Created using `listAtom`.
 
 ```typescript
+// atoms/listState.ts
 import { listAtom } from 'recoil-tools';
 
-const userListState = listAtom<
+export default listAtom<
   { id: string; email: string },
   { activeItemId: string | null }
 >({
-  key: 'userListState',
+  key: 'listState',
   default: {
     data: [],
     meta: { activeItemId: null },
@@ -27,39 +37,25 @@ const userListState = listAtom<
 });
 ```
 
-###### Usage
+Access to the list state and setters is provided through `useRecoilList` hook.
 
 ```typescript jsx
-import { useRecoilListState } from 'recoil-tools';
+import { useRecoilList } from 'recoil-tools';
+import listState from './atoms/listState';
 
-function Users(): JSX.Element {
-  const [state, setters] = useRecoilListState(userListState);
-
-  return (
-    <ul>
-      {state.data.map((user) => (
-        <li key={user.id}>{user.email}</li>
-      ))}
-    </ul>
-  );
+function App() {
+  const [state, setters] = useRecoilList(listState);
 }
 ```
 
-You can also use only list state's `data` property:
+You can also use only state's `data` property:
 
 ```typescript jsx
 import { useRecoilListData } from 'recoil-tools';
+import listState from './atoms/listState';
 
-function Users(): JSX.Element {
-  const users = useRecoilListData(userListState);
-
-  return (
-    <ul>
-      {users.map((user) => (
-        <li key={user.id}>{user.email}</li>
-      ))}
-    </ul>
-  );
+function App() {
+  const users = useRecoilListData(listState);
 }
 ```
 
@@ -67,11 +63,10 @@ Or only `meta` property:
 
 ```typescript jsx
 import { useRecoilListMeta } from 'recoil-tools';
+import listState from './atoms/listState';
 
-function Users(): JSX.Element {
-  const { activeUserId } = useRecoilListMeta(userListState);
-
-  return <div>Active user ID: {activeUserId}</div>;
+function App() {
+  const { activeUserId } = useRecoilListMeta(listState);
 }
 ```
 
@@ -79,15 +74,10 @@ Or only state setters:
 
 ```typescript jsx
 import { useRecoilListSetters } from 'recoil-tools';
+import listState from './atoms/listState';
 
-function Users(): JSX.Element {
-  const { reverse } = useRecoilListSetters(userListState);
-
-  return (
-    <div>
-      <button onClick={reverse}>Reverse items</button>
-    </div>
-  );
+function App() {
+  const { push, reverse } = useRecoilListSetters(listState);
 }
 ```
 
@@ -102,7 +92,7 @@ type RecoilListState<T, U> = Readonly<{
    */
   data: T[];
   /**
-   * Any meta data related to the list.
+   * Any metadata related to the list.
    */
   meta: U;
 }>;
@@ -113,7 +103,7 @@ type RecoilListState<T, U> = Readonly<{
 ```typescript
 type RecoilListSetters<T, U> = Readonly<{
   /**
-   * Sets `data` property.
+   * `data` property setter.
    */
   setData: SetterOrUpdater<T[]>;
   /**
@@ -121,7 +111,7 @@ type RecoilListSetters<T, U> = Readonly<{
    */
   clearData: () => void;
   /**
-   * Sets `meta` property.
+   * `meta` property setter.
    */
   setMeta: SetterOrUpdater<U>;
   /**
@@ -132,6 +122,15 @@ type RecoilListSetters<T, U> = Readonly<{
    * Inserts an arbitrary number of items at the end of the list.
    */
   push: (...items: T[]) => void;
+  /**
+   * Clears list and inserts an arbitrary number of items.
+   * Basically a combination of `clearData` and `push`.
+   */
+  clearPush: (...items: T[]) => void;
+  /**
+   * Inserts a new item if predicate doesn't return `true`.
+   */
+  upsert: (predicate: (item: T, index: number) => boolean, newItem: T) => void;
   /**
    * Updates an item at a particular index.
    */
@@ -171,7 +170,7 @@ type RecoilListSetters<T, U> = Readonly<{
    */
   sort: (compareFn?: (a: T, b: T) => number) => void;
   /**
-   * Reverse order of list items.
+   * Works like native `Array.reverse`.
    */
   reverse: () => void;
 }>;
@@ -179,19 +178,18 @@ type RecoilListSetters<T, U> = Readonly<{
 
 ## Dialog
 
-Used for storing state of modal windows and dialogs.
+Useful for managing state of global dialog windows like app theme, language, settings or confirmation dialog.
 
 ### Creation and Usage
 
-Created using `dialogAtom` function similarly to a regular Recoil atom, except dialog enforces its own state structure.
-
-###### Creation
+Created using `dialogAtom`.
 
 ```typescript
+// atoms/dialogState.ts
 import { dialogAtom } from 'recoil-tools';
 
-const settingsDialogState = dialogAtom<{ isDarkMode: boolean }>({
-  key: 'settingsDialogState',
+export default dialogAtom<{ isDarkMode: boolean }>({
+  key: 'dialogState',
   default: {
     isOpen: false,
     meta: { isDarkMode: false },
@@ -199,33 +197,25 @@ const settingsDialogState = dialogAtom<{ isDarkMode: boolean }>({
 });
 ```
 
-###### Usage
+Access to the dialog state and setters is provided through `useRecoilDialog` hook.
 
 ```typescript jsx
-import { useRecoilListState } from 'recoil-tools';
+import { useRecoilDialog } from 'recoil-tools';
+import dialogState from './atoms/dialogState';
 
-function SettingsDialog(): JSX.Element {
-  const [state, setters] = useRecoilDialogState(settingsDialogState);
-
-  return (
-    <Dialog open={state.isOpen} onClose={setters.close}>
-      Dark mode: {state.meta.isDarkMode ? 'yes' : 'no'}
-    </Dialog>
-  );
+function App() {
+  const [state, setters] = useRecoilDialog(dialogState);
 }
 ```
 
-You can also use only dialog state's `isOpen` property:
+You can also use only state's `isOpen` property:
 
 ```typescript jsx
 import { useRecoilDialogIsOpen } from 'recoil-tools';
+import dialogState from './atoms/dialogState';
 
-function SettingsDialog(): JSX.Element {
-  const isOpen = useRecoilDialogIsOpen(settingsDialogState);
-
-  return (
-    <Dialog open={isOpen} {...props} />
-  );
+function App() {
+  const isOpen = useRecoilDialogIsOpen(dialogState);
 }
 ```
 
@@ -233,27 +223,21 @@ Or only `meta` property:
 
 ```typescript jsx
 import { useRecoilDialogMeta } from 'recoil-tools';
+import dialogState from './atoms/dialogState';
 
-function Anywhere(): JSX.Element {
-  const { isDarkMode } = useRecoilDialogMeta(settingsDialogState);
-
-  return <div>Dark mode: {isDarkMode ? 'yes' : 'no'}</div>;
+function App(): JSX.Element {
+  const { isDarkMode } = useRecoilDialogMeta(dialogState);
 }
 ```
 
 Or only state setters:
 
 ```typescript jsx
-import { useRecoilListSetters } from 'recoil-tools';
+import { useRecoilDialogSetters } from 'recoil-tools';
+import dialogState from './atoms/dialogState';
 
-function Users(): JSX.Element {
-  const { reverse } = useRecoilListSetters(userListState);
-
-  return (
-    <div>
-      <button onClick={reverse}>Reverse items</button>
-    </div>
-  );
+function App() {
+  const { open } = useRecoilDialogSetters(userListState);
 }
 ```
 
@@ -268,7 +252,7 @@ type RecoilDialogState<T> = Readonly<{
    */
   isOpen: boolean;
   /**
-   * Any meta data related to the dialog.
+   * Any metadata related to the dialog.
    */
   meta: T;
 }>;
@@ -279,19 +263,244 @@ type RecoilDialogState<T> = Readonly<{
 ```typescript
 type RecoilDialogSetters<T> = Readonly<{
   /**
-   * Sets `isOpen` state.
+   * `isOpen` property setter.
    */
   setOpen: SetterOrUpdater<boolean>;
   /**
-   * Sets `isOpen` state to `true`.
+   * Sets `isOpen` state to `true`. Also supports setting `meta` property.
    */
-  open: () => void;
+  open: (meta?: T) => void;
   /**
    * Sets `isOpen` state to `false`.
    */
   close: () => void;
   /**
-   * Sets `meta` property.
+   * `meta` property setter.
+   */
+  setMeta: SetterOrUpdater<T>;
+}>;
+```
+
+## Filters
+
+Useful for storing and applying values used for filtering data.
+
+### Creation and Usage
+
+Created using `filtersAtom`.
+
+```typescript
+// atoms/filtersState.ts
+import { filtersAtom } from 'recoil-tools';
+
+export default filtersAtom<{ isActive: boolean; categoryId: string }>({
+  key: 'filtersState',
+  default: {
+    isOpen: false,
+    isApplied: false,
+    values: { isActive: false, categoryId: '' },
+  },
+});
+```
+
+Access to the filters state and setters is provided through `useRecoilFilters` hook.
+
+```typescript jsx
+import { useRecoilFilters } from 'recoil-tools';
+import filtersState from './atoms/filtersState';
+
+function App() {
+  const [state, setters] = useRecoilFilters(filtersState);
+}
+```
+
+You can also use only state's `isOpen` property:
+
+```typescript jsx
+import { useRecoilFiltersIsOpen } from 'recoil-tools';
+import filtersState from './atoms/filtersState';
+
+function App() {
+  const isOpen = useRecoilFiltersIsOpen(filtersState);
+}
+```
+
+Or only `isApplied` property:
+
+```typescript jsx
+import { useRecoilFiltersIsApplied } from 'recoil-tools';
+import filtersState from './atoms/filtersState';
+
+function App() {
+  const isApplied = useRecoilFiltersIsApplied(filtersState);
+}
+```
+
+Or only `values` property:
+
+```typescript jsx
+import { useRecoilFiltersValues } from 'recoil-tools';
+import filtersState from './atoms/filtersState';
+
+function App() {
+  const values = useRecoilFiltersValues(filtersState);
+}
+```
+
+Or only state setters:
+
+```typescript jsx
+import { useRecoilFiltersSetters } from 'recoil-tools';
+import filtersState from './atoms/filtersState';
+
+function App() {
+  const { apply } = useRecoilFiltersSetters(filtersState);
+}
+```
+
+### API Reference
+
+#### State
+
+```typescript
+type RecoilFiltersState<T extends Record<string, any>> = Readonly<{
+  /**
+   * Filters open state.
+   */
+  isOpen: boolean;
+  /**
+   * Whether filters have been applied.
+   */
+  isApplied: boolean;
+  /**
+   * Filter values object.
+   */
+  values: T;
+}>;
+```
+
+#### Setters
+
+```typescript
+type RecoilFiltersSetters<T extends Record<string, any>> = Readonly<{
+  /**
+   * `isOpen` property setter.
+   */
+  setOpen: SetterOrUpdater<boolean>;
+  /**
+   * `isApplied` property setter.
+   */
+  setApplied: SetterOrUpdater<boolean>;
+  /**
+   * Sets `isOpen` property to `true`.
+   */
+  open: () => void;
+  /**
+   * Sets `isOpen` property to `false`.
+   */
+  close: () => void;
+  /**
+   * Applies values by setting `values` property
+   * and `isApplied` property to `true`.
+   */
+  apply: SetterOrUpdater<T>;
+}>;
+```
+
+## Pagination
+
+Static storage of pagination state.
+
+### Creation and Usage
+
+Created using `paginationAtom`.
+
+```typescript
+// atoms/paginationState.ts
+import { paginationAtom } from 'recoil-tools';
+
+export default paginationAtom({
+  key: 'paginationState',
+  default: {
+    total: 0,
+    page: 1,
+    limit: 10,
+    offset: 0,
+    meta: undefined,
+  },
+});
+```
+
+Access to the pagination state and setters is provided through `useRecoilPagination` hook.
+
+```typescript jsx
+import { useRecoilPagination } from 'recoil-tools';
+import paginationState from './atoms/paginationState';
+
+function App() {
+  const [state, setters] = useRecoilPagination(paginationState);
+}
+```
+
+You can also use only state setters:
+
+```typescript jsx
+import { useRecoilPaginationSetters } from 'recoil-tools';
+import paginationState from './atoms/paginationState';
+
+function App() {
+  const { setPage, setLimit } = useRecoilPaginationSetters(paginationState);
+}
+```
+
+### API Reference
+
+#### State
+
+```typescript
+type RecoilPaginationState<T> = Readonly<{
+  /**
+   * Total number of records.
+   */
+  total: number;
+  /**
+   * Current page number.
+   */
+  page: number;
+  /**
+   * Number of records per page.
+   */
+  limit: number;
+  /**
+   * Automatically calculated property based on `page` and `limit`
+   * that shows current offset in records.
+   */
+  offset: number;
+  /**
+   * Any metadata related to the pagination.
+   */
+  meta: T;
+}>;
+```
+
+#### Setters
+
+```typescript
+type RecoilPaginationSetters<T> = Readonly<{
+  /**
+   * `total` property setter.
+   */
+  setTotal: SetterOrUpdater<number>;
+  /**
+   * `page` property setter.
+   */
+  setPage: SetterOrUpdater<number>;
+  /**
+   * `limit` property setter.
+   */
+  setLimit: SetterOrUpdater<number>;
+  /**
+   * `meta` property setter.
    */
   setMeta: SetterOrUpdater<T>;
 }>;

@@ -7,6 +7,7 @@ import {
   useRecoilValue,
   SetterOrUpdater,
 } from 'recoil';
+import { executeUpdater } from './utils';
 
 /**
  * Recoil List state.
@@ -17,17 +18,17 @@ export type RecoilListState<T, U> = Readonly<{
    */
   data: T[];
   /**
-   * Any meta data related to the list.
+   * Any metadata related to the list.
    */
   meta: U;
 }>;
 
 /**
- * Result of the `useListRecoilState` hook.
+ * List state setters.
  */
 export type RecoilListSetters<T, U> = Readonly<{
   /**
-   * Sets `data` property.
+   * `data` property setter.
    */
   setData: SetterOrUpdater<T[]>;
   /**
@@ -35,7 +36,7 @@ export type RecoilListSetters<T, U> = Readonly<{
    */
   clearData: () => void;
   /**
-   * Sets `meta` property.
+   * `meta` property setter.
    */
   setMeta: SetterOrUpdater<U>;
   /**
@@ -46,6 +47,15 @@ export type RecoilListSetters<T, U> = Readonly<{
    * Inserts an arbitrary number of items at the end of the list.
    */
   push: (...items: T[]) => void;
+  /**
+   * Clears list and inserts an arbitrary number of items.
+   * Basically a combination of `clearData` and `push`.
+   */
+  clearPush: (...items: T[]) => void;
+  /**
+   * Inserts a new item if predicate doesn't return `true`.
+   */
+  upsert: (predicate: (item: T, index: number) => boolean, newItem: T) => void;
   /**
    * Updates an item at a particular index.
    */
@@ -85,7 +95,7 @@ export type RecoilListSetters<T, U> = Readonly<{
    */
   sort: (compareFn?: (a: T, b: T) => number) => void;
   /**
-   * Reverse order of list items.
+   * Works like native `Array.reverse`.
    */
   reverse: () => void;
 }>;
@@ -115,7 +125,7 @@ export const listAtom = <T, U>(
  *
  * @param recoilListState - Recoil List state.
  */
-export const useRecoilListState = <T, U>(
+export const useRecoilList = <T, U>(
   recoilListState: RecoilState<RecoilListState<T, U>>
 ): [RecoilListState<T, U>, RecoilListSetters<T, U>] => {
   const [state, setState] = useRecoilState(recoilListState);
@@ -124,10 +134,7 @@ export const useRecoilListState = <T, U>(
     (valOrUpdater) => {
       setState((prevState) => ({
         ...prevState,
-        data:
-          typeof valOrUpdater === 'function'
-            ? valOrUpdater(prevState.data)
-            : valOrUpdater,
+        data: executeUpdater(valOrUpdater, prevState.data),
       }));
     },
     [setState]
@@ -137,10 +144,7 @@ export const useRecoilListState = <T, U>(
     (valOrUpdater) => {
       setState((prevState) => ({
         ...prevState,
-        meta:
-          typeof valOrUpdater === 'function'
-            ? (valOrUpdater as any)(prevState.meta)
-            : valOrUpdater,
+        meta: executeUpdater(valOrUpdater, prevState.meta),
       }));
     },
     [setState]
@@ -171,6 +175,30 @@ export const useRecoilListState = <T, U>(
     [setState]
   );
 
+  const clearPush = React.useCallback<RecoilListSetters<T, U>['clearPush']>(
+    (...data) =>
+      setState((prevState) => ({
+        ...prevState,
+        data,
+      })),
+    [setState]
+  );
+
+  const upsert = React.useCallback<RecoilListSetters<T, U>['upsert']>(
+    (predicate, newItem) =>
+      setState((prevState) => {
+        const index = prevState.data.findIndex(predicate);
+
+        if (index >= 0) return prevState;
+
+        return {
+          ...prevState,
+          data: prevState.data.concat([newItem]),
+        };
+      }),
+    [setState]
+  );
+
   const updateAt = React.useCallback<RecoilListSetters<T, U>['updateAt']>(
     (index, item) => {
       setState((prevState) => ({
@@ -191,7 +219,7 @@ export const useRecoilListState = <T, U>(
           data: updateArrayItemAt(prevState.data, index, newItem),
         };
       }),
-    [setState, updateAt]
+    [setState]
   );
 
   const updateAll = React.useCallback<RecoilListSetters<T, U>['updateAll']>(
@@ -270,8 +298,10 @@ export const useRecoilListState = <T, U>(
       setData,
       setMeta,
       clearData,
-      push,
       unshift,
+      push,
+      clearPush,
+      upsert,
       updateAt,
       update,
       updateAll,
@@ -326,7 +356,7 @@ export const useRecoilListMeta = <T>(
 export const useRecoilListSetters = <T, U>(
   recoilListState: RecoilState<RecoilListState<T, U>>
 ): RecoilListSetters<T, U> => {
-  const [, setters] = useRecoilListState<T, U>(recoilListState);
+  const [, setters] = useRecoilList<T, U>(recoilListState);
   return setters;
 };
 

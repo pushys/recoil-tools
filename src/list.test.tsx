@@ -1,7 +1,7 @@
 import React from 'react';
 import { RecoilRoot } from 'recoil';
 import { renderHook, act } from '@testing-library/react-hooks';
-import { listAtom, useRecoilListState } from './list';
+import { listAtom, useRecoilList } from './list';
 
 let key = 0;
 
@@ -22,7 +22,7 @@ describe('Recoil List', () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <RecoilRoot>{children}</RecoilRoot>
     );
-    const { result } = renderHook(() => useRecoilListState(atom), { wrapper });
+    const { result } = renderHook(() => useRecoilList(atom), { wrapper });
 
     act(() => {
       result.current[1].setData([1, 2, 3]);
@@ -46,7 +46,7 @@ describe('Recoil List', () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <RecoilRoot>{children}</RecoilRoot>
     );
-    const { result } = renderHook(() => useRecoilListState(atom), { wrapper });
+    const { result } = renderHook(() => useRecoilList(atom), { wrapper });
 
     act(() => {
       result.current[1].setData((prevData) => [...prevData, 3, 4]);
@@ -70,7 +70,7 @@ describe('Recoil List', () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <RecoilRoot>{children}</RecoilRoot>
     );
-    const { result } = renderHook(() => useRecoilListState(atom), { wrapper });
+    const { result } = renderHook(() => useRecoilList(atom), { wrapper });
 
     act(() => {
       result.current[1].clearData();
@@ -94,15 +94,15 @@ describe('Recoil List', () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <RecoilRoot>{children}</RecoilRoot>
     );
-    const { result } = renderHook(() => useRecoilListState(atom), { wrapper });
+    const { result } = renderHook(() => useRecoilList(atom), { wrapper });
 
     act(() => {
-      result.current[1].setMeta('meta data');
+      result.current[1].setMeta('metadata');
     });
 
     expect(result.current[0]).toMatchObject({
       data: [],
-      meta: 'meta data',
+      meta: 'metadata',
     });
   });
 
@@ -118,39 +118,15 @@ describe('Recoil List', () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <RecoilRoot>{children}</RecoilRoot>
     );
-    const { result } = renderHook(() => useRecoilListState(atom), { wrapper });
+    const { result } = renderHook(() => useRecoilList(atom), { wrapper });
 
     act(() => {
-      result.current[1].setMeta((prevMeta) => `${prevMeta} data`);
+      result.current[1].setMeta((prevMeta) => `${prevMeta}data`);
     });
 
     expect(result.current[0]).toMatchObject({
       data: [],
-      meta: 'meta data',
-    });
-  });
-
-  it('should push items', () => {
-    const atom = listAtom<number, undefined>({
-      key: `list${key}`,
-      default: {
-        data: [1, 2],
-        meta: undefined,
-      },
-    });
-
-    const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <RecoilRoot>{children}</RecoilRoot>
-    );
-    const { result } = renderHook(() => useRecoilListState(atom), { wrapper });
-
-    act(() => {
-      result.current[1].push(3, 4);
-    });
-
-    expect(result.current[0]).toMatchObject({
-      data: [1, 2, 3, 4],
-      meta: undefined,
+      meta: 'metadata',
     });
   });
 
@@ -166,7 +142,7 @@ describe('Recoil List', () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <RecoilRoot>{children}</RecoilRoot>
     );
-    const { result } = renderHook(() => useRecoilListState(atom), { wrapper });
+    const { result } = renderHook(() => useRecoilList(atom), { wrapper });
 
     act(() => {
       result.current[1].unshift(3, 4);
@@ -174,6 +150,102 @@ describe('Recoil List', () => {
 
     expect(result.current[0]).toMatchObject({
       data: [3, 4, 1, 2],
+      meta: undefined,
+    });
+  });
+
+  it('should push items', () => {
+    const atom = listAtom<number, undefined>({
+      key: `list${key}`,
+      default: {
+        data: [1, 2],
+        meta: undefined,
+      },
+    });
+
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <RecoilRoot>{children}</RecoilRoot>
+    );
+    const { result } = renderHook(() => useRecoilList(atom), { wrapper });
+
+    act(() => {
+      result.current[1].push(3, 4);
+    });
+
+    expect(result.current[0]).toMatchObject({
+      data: [1, 2, 3, 4],
+      meta: undefined,
+    });
+  });
+
+  it('should clear and push items', () => {
+    const atom = listAtom<number, undefined>({
+      key: `list${key}`,
+      default: {
+        data: [1, 2, 3],
+        meta: undefined,
+      },
+    });
+
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <RecoilRoot>{children}</RecoilRoot>
+    );
+    const { result } = renderHook(() => useRecoilList(atom), { wrapper });
+
+    act(() => {
+      result.current[1].clearPush(4, 5, 6);
+    });
+
+    expect(result.current[0]).toMatchObject({
+      data: [4, 5, 6],
+      meta: undefined,
+    });
+  });
+
+  it('should push item if not exists', () => {
+    const atom = listAtom<number, undefined>({
+      key: `list${key}`,
+      default: {
+        data: [1, 2, 3],
+        meta: undefined,
+      },
+    });
+
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <RecoilRoot>{children}</RecoilRoot>
+    );
+    const { result } = renderHook(() => useRecoilList(atom), { wrapper });
+
+    act(() => {
+      result.current[1].upsert((item) => item === 4, 4);
+    });
+
+    expect(result.current[0]).toMatchObject({
+      data: [1, 2, 3, 4],
+      meta: undefined,
+    });
+  });
+
+  it('should not push item if already exists', () => {
+    const atom = listAtom<number, undefined>({
+      key: `list${key}`,
+      default: {
+        data: [1, 2, 3],
+        meta: undefined,
+      },
+    });
+
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <RecoilRoot>{children}</RecoilRoot>
+    );
+    const { result } = renderHook(() => useRecoilList(atom), { wrapper });
+
+    act(() => {
+      result.current[1].upsert((item) => item === 3, 3);
+    });
+
+    expect(result.current[0]).toMatchObject({
+      data: [1, 2, 3],
       meta: undefined,
     });
   });
@@ -190,7 +262,7 @@ describe('Recoil List', () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <RecoilRoot>{children}</RecoilRoot>
     );
-    const { result } = renderHook(() => useRecoilListState(atom), { wrapper });
+    const { result } = renderHook(() => useRecoilList(atom), { wrapper });
 
     act(() => {
       result.current[1].updateAt(2, 10);
@@ -214,7 +286,7 @@ describe('Recoil List', () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <RecoilRoot>{children}</RecoilRoot>
     );
-    const { result } = renderHook(() => useRecoilListState(atom), { wrapper });
+    const { result } = renderHook(() => useRecoilList(atom), { wrapper });
 
     act(() => {
       result.current[1].update((item) => item === 1 || item === 4, 10);
@@ -238,7 +310,7 @@ describe('Recoil List', () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <RecoilRoot>{children}</RecoilRoot>
     );
-    const { result } = renderHook(() => useRecoilListState(atom), { wrapper });
+    const { result } = renderHook(() => useRecoilList(atom), { wrapper });
 
     act(() => {
       result.current[1].updateAll((item) => item === 1 || item === 4, 10);
@@ -262,7 +334,7 @@ describe('Recoil List', () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <RecoilRoot>{children}</RecoilRoot>
     );
-    const { result } = renderHook(() => useRecoilListState(atom), { wrapper });
+    const { result } = renderHook(() => useRecoilList(atom), { wrapper });
 
     act(() => {
       result.current[1].removeAt(3);
@@ -286,7 +358,7 @@ describe('Recoil List', () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <RecoilRoot>{children}</RecoilRoot>
     );
-    const { result } = renderHook(() => useRecoilListState(atom), { wrapper });
+    const { result } = renderHook(() => useRecoilList(atom), { wrapper });
 
     act(() => {
       result.current[1].remove((item) => item === 2 || item === 3);
@@ -310,7 +382,7 @@ describe('Recoil List', () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <RecoilRoot>{children}</RecoilRoot>
     );
-    const { result } = renderHook(() => useRecoilListState(atom), { wrapper });
+    const { result } = renderHook(() => useRecoilList(atom), { wrapper });
 
     act(() => {
       result.current[1].removeAll((item) => item === 2 || item === 3);
@@ -334,7 +406,7 @@ describe('Recoil List', () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <RecoilRoot>{children}</RecoilRoot>
     );
-    const { result } = renderHook(() => useRecoilListState(atom), { wrapper });
+    const { result } = renderHook(() => useRecoilList(atom), { wrapper });
 
     act(() => {
       result.current[1].filter((item) => item % 2 === 0);
@@ -358,7 +430,7 @@ describe('Recoil List', () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <RecoilRoot>{children}</RecoilRoot>
     );
-    const { result } = renderHook(() => useRecoilListState(atom), { wrapper });
+    const { result } = renderHook(() => useRecoilList(atom), { wrapper });
 
     act(() => {
       result.current[1].sort((item1, item2) => item1 - item2);
@@ -382,7 +454,7 @@ describe('Recoil List', () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <RecoilRoot>{children}</RecoilRoot>
     );
-    const { result } = renderHook(() => useRecoilListState(atom), { wrapper });
+    const { result } = renderHook(() => useRecoilList(atom), { wrapper });
 
     act(() => {
       result.current[1].reverse();

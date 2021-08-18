@@ -7,6 +7,7 @@ import {
   useRecoilValue,
   SetterOrUpdater,
 } from 'recoil';
+import { executeUpdater } from './utils';
 
 /**
  * Recoil Dialog state.
@@ -17,29 +18,29 @@ export type RecoilDialogState<T> = Readonly<{
    */
   isOpen: boolean;
   /**
-   * Any meta data related to the dialog.
+   * Any metadata related to the dialog.
    */
   meta: T;
 }>;
 
 /**
- * Result of the `useRecoilDialogState` hook.
+ * Dialog state setters.
  */
 export type RecoilDialogSetters<T> = Readonly<{
   /**
-   * Sets `isOpen` state.
+   * `isOpen` property setter.
    */
   setOpen: SetterOrUpdater<boolean>;
   /**
-   * Sets `isOpen` state to `true`.
+   * Sets `isOpen` state to `true`. Also supports setting `meta` property.
    */
-  open: () => void;
+  open: (meta?: T) => void;
   /**
    * Sets `isOpen` state to `false`.
    */
   close: () => void;
   /**
-   * Sets `meta` property.
+   * `meta` property setter.
    */
   setMeta: SetterOrUpdater<T>;
 }>;
@@ -69,7 +70,7 @@ export const dialogAtom = <T>(
  *
  * @param recoilDialogState - Recoil Dialog state.
  */
-export const useRecoilDialogState = <T>(
+export const useRecoilDialog = <T>(
   recoilDialogState: RecoilState<RecoilDialogState<T>>
 ): [RecoilDialogState<T>, RecoilDialogSetters<T>] => {
   const [state, setState] = useRecoilState(recoilDialogState);
@@ -78,21 +79,22 @@ export const useRecoilDialogState = <T>(
     (valOrUpdater) => {
       setState((prevState) => ({
         ...prevState,
-        isOpen:
-          typeof valOrUpdater === 'function'
-            ? valOrUpdater(prevState.isOpen)
-            : valOrUpdater,
+        isOpen: executeUpdater(valOrUpdater, prevState.isOpen),
       }));
     },
     [setState]
   );
 
-  const open = React.useCallback<RecoilDialogSetters<T>['open']>(() => {
-    setState((prevState) => ({
-      ...prevState,
-      isOpen: true,
-    }));
-  }, [setState]);
+  const open = React.useCallback<RecoilDialogSetters<T>['open']>(
+    (meta) => {
+      setState((prevState) => ({
+        ...prevState,
+        ...(meta !== undefined && { meta }),
+        isOpen: true,
+      }));
+    },
+    [setState]
+  );
 
   const close = React.useCallback<RecoilDialogSetters<T>['close']>(() => {
     setState((prevState) => ({
@@ -105,10 +107,7 @@ export const useRecoilDialogState = <T>(
     (valOrUpdater) => {
       setState((prevState) => ({
         ...prevState,
-        meta:
-          typeof valOrUpdater === 'function'
-            ? (valOrUpdater as any)(prevState.meta)
-            : valOrUpdater,
+        meta: executeUpdater(valOrUpdater, prevState.meta),
       }));
     },
     [setState]
@@ -166,6 +165,6 @@ export const useRecoilDialogMeta = <T>(
 export const useRecoilDialogSetters = <T>(
   recoilDialogState: RecoilState<RecoilDialogState<T>>
 ): RecoilDialogSetters<T> => {
-  const [, setters] = useRecoilDialogState<T>(recoilDialogState);
+  const [, setters] = useRecoilDialog<T>(recoilDialogState);
   return setters;
 };
