@@ -58,6 +58,14 @@ export type RecoilPaginationSetters<T> = Readonly<{
 }>;
 
 /**
+ * `useRecoilPagination` hook result.
+ */
+export type UseRecoilPaginationResult<T> = [
+  RecoilPaginationState<T>,
+  RecoilPaginationSetters<T>
+];
+
+/**
  * Recoil Pagination atom.
  *
  * @param options - Pagination atom options.
@@ -87,7 +95,7 @@ export const paginationAtom = <T>(
  */
 export const useRecoilPagination = <T>(
   recoilPaginationState: RecoilState<RecoilPaginationState<T>>
-): [RecoilPaginationState<T>, RecoilPaginationSetters<T>] => {
+): UseRecoilPaginationResult<T> => {
   const [state, setState] = useRecoilState(recoilPaginationState);
 
   const setTotal = React.useCallback<RecoilPaginationSetters<T>['setTotal']>(

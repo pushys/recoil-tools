@@ -55,6 +55,14 @@ export type RecoilFiltersSetters<T extends Record<string, any>> = Readonly<{
 }>;
 
 /**
+ * `useRecoilFilters` hook result.
+ */
+export type UseRecoilFiltersResult<T> = [
+  RecoilFiltersState<T>,
+  RecoilFiltersSetters<T>
+];
+
+/**
  * Recoil Filters atom.
  *
  * @param options - Filters atom options.
@@ -82,7 +90,7 @@ export const filtersAtom = <T extends Record<string, any>>(
  */
 export const useRecoilFilters = <T extends Record<string, any>>(
   recoilFiltersState: RecoilState<RecoilFiltersState<T>>
-): [RecoilFiltersState<T>, RecoilFiltersSetters<T>] => {
+): UseRecoilFiltersResult<T> => {
   const [state, setState] = useRecoilState(recoilFiltersState);
 
   const setOpen = React.useCallback<RecoilFiltersSetters<T>['setOpen']>(

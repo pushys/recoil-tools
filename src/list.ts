@@ -101,6 +101,14 @@ export type RecoilListSetters<T, U> = Readonly<{
 }>;
 
 /**
+ * `useRecoilList` hook result.
+ */
+export type UseRecoilListResult<T, U> = [
+  RecoilListState<T, U>,
+  RecoilListSetters<T, U>
+];
+
+/**
  * Recoil List atom.
  *
  * @param options - List atom options.
@@ -127,7 +135,7 @@ export const listAtom = <T, U>(
  */
 export const useRecoilList = <T, U>(
   recoilListState: RecoilState<RecoilListState<T, U>>
-): [RecoilListState<T, U>, RecoilListSetters<T, U>] => {
+): UseRecoilListResult<T, U> => {
   const [state, setState] = useRecoilState(recoilListState);
 
   const setData = React.useCallback<RecoilListSetters<T, U>['setData']>(
