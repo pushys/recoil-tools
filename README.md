@@ -7,7 +7,7 @@ This library only includes static atoms for data storage, no asynchronous logic 
 
 ## Installation
 
-`npm i recoil-tools`
+`npm i recoil-tools --save`
 
 or
 

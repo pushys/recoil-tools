@@ -46,6 +46,14 @@ export type RecoilDialogSetters<T> = Readonly<{
 }>;
 
 /**
+ * `useRecoilDialog` hook result.
+ */
+export type UseRecoilDialogResult<T> = [
+  RecoilDialogState<T>,
+  RecoilDialogSetters<T>
+];
+
+/**
  * Recoil Dialog atom.
  *
  * @param options - Dialog atom options.
@@ -72,7 +80,7 @@ export const dialogAtom = <T>(
  */
 export const useRecoilDialog = <T>(
   recoilDialogState: RecoilState<RecoilDialogState<T>>
-): [RecoilDialogState<T>, RecoilDialogSetters<T>] => {
+): UseRecoilDialogResult<T> => {
   const [state, setState] = useRecoilState(recoilDialogState);
 
   const setOpen = React.useCallback<RecoilDialogSetters<T>['setOpen']>(
