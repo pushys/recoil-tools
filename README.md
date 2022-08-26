@@ -173,6 +173,10 @@ type RecoilListSetters<T, U> = Readonly<{
    * Works like native `Array.reverse`.
    */
   reverse: () => void;
+  /**
+   * Resets list state to initial. Done through `useResetRecoilState`.
+   */
+  reset: () => void;
 }>;
 ```
 
@@ -278,6 +282,10 @@ type RecoilDialogSetters<T> = Readonly<{
    * `meta` property setter.
    */
   setMeta: SetterOrUpdater<T>;
+  /**
+   * Resets dialog state to initial. Done through `useResetRecoilState`.
+   */
+  reset: () => void;
 }>;
 ```
 
@@ -404,6 +412,10 @@ type RecoilFiltersSetters<T extends Record<string, any>> = Readonly<{
    * and `isApplied` property to `true`.
    */
   apply: SetterOrUpdater<T>;
+  /**
+   * Resets filters state to initial. Done through `useResetRecoilState`.
+   */
+  reset: () => void;
 }>;
 ```
 
@@ -503,5 +515,9 @@ type RecoilPaginationSetters<T> = Readonly<{
    * `meta` property setter.
    */
   setMeta: SetterOrUpdater<T>;
+  /**
+   * Resets pagination state to initial. Done through `useResetRecoilState`.
+   */
+  reset: () => void;
 }>;
 ```

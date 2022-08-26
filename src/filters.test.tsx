@@ -180,4 +180,34 @@ describe('Recoil Filters', () => {
       values: { userId: '3', categoryId: '1' },
     });
   });
+
+  it('should reset filters state', () => {
+    const atom = filtersAtom<{ userId: string }>({
+      key: `filters${key}`,
+      default: {
+        isOpen: false,
+        isApplied: false,
+        values: { userId: '3' },
+      },
+    });
+
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <RecoilRoot>{children}</RecoilRoot>
+    );
+    const { result } = renderHook(() => useRecoilFilters(atom), {
+      wrapper,
+    });
+
+    act(() => {
+      result.current[1].apply({ userId: '8' });
+      result.current[1].open();
+      result.current[1].reset();
+    });
+
+    expect(result.current[0]).toMatchObject({
+      isOpen: false,
+      isApplied: false,
+      values: { userId: '3' },
+    });
+  });
 });

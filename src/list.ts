@@ -5,6 +5,7 @@ import {
   AtomOptions,
   useRecoilState,
   useRecoilValue,
+  useResetRecoilState,
   SetterOrUpdater,
 } from 'recoil';
 import { executeUpdater } from './utils';
@@ -98,6 +99,10 @@ export type RecoilListSetters<T, U> = Readonly<{
    * Works like native `Array.reverse`.
    */
   reverse: () => void;
+  /**
+   * Resets list state to initial. Done through `useResetRecoilState`.
+   */
+  reset: () => void;
 }>;
 
 /**
@@ -137,6 +142,7 @@ export const useRecoilList = <T, U>(
   recoilListState: RecoilState<RecoilListState<T, U>>
 ): UseRecoilListResult<T, U> => {
   const [state, setState] = useRecoilState(recoilListState);
+  const reset = useResetRecoilState(recoilListState);
 
   const setData = React.useCallback<RecoilListSetters<T, U>['setData']>(
     (valOrUpdater) => {
@@ -319,6 +325,7 @@ export const useRecoilList = <T, U>(
       filter,
       sort,
       reverse,
+      reset,
     },
   ];
 };

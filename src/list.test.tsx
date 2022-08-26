@@ -465,4 +465,32 @@ describe('Recoil List', () => {
       meta: undefined,
     });
   });
+
+  it('should reset list state', () => {
+    const atom = listAtom<number, undefined | string>({
+      key: `list${key}`,
+      default: {
+        data: [1, 2, 3, 4, 5],
+        meta: undefined,
+      },
+    });
+
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <RecoilRoot>{children}</RecoilRoot>
+    );
+    const { result } = renderHook(() => useRecoilList(atom), { wrapper });
+
+    act(() => {
+      result.current[1].reverse();
+      result.current[1].unshift();
+      result.current[1].removeAt(2);
+      result.current[1].setMeta('meta');
+      result.current[1].reset();
+    });
+
+    expect(result.current[0]).toMatchObject({
+      data: [1, 2, 3, 4, 5],
+      meta: undefined,
+    });
+  });
 });
