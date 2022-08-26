@@ -194,4 +194,32 @@ describe('Recoil Dialog', () => {
       meta: { userId: '1', commentId: '42' },
     });
   });
+
+  it('should reset dialog state', () => {
+    const atom = dialogAtom<{ userId: string }>({
+      key: `dialog${key}`,
+      default: {
+        isOpen: true,
+        meta: { userId: '1' },
+      },
+    });
+
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <RecoilRoot>{children}</RecoilRoot>
+    );
+    const { result } = renderHook(() => useRecoilDialog(atom), {
+      wrapper,
+    });
+
+    act(() => {
+      result.current[1].setMeta({ userId: '2' });
+      result.current[1].close();
+      result.current[1].reset();
+    });
+
+    expect(result.current[0]).toMatchObject({
+      isOpen: true,
+      meta: { userId: '1' },
+    });
+  });
 });

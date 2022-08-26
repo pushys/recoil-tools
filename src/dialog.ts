@@ -5,6 +5,7 @@ import {
   AtomOptions,
   useRecoilState,
   useRecoilValue,
+  useResetRecoilState,
   SetterOrUpdater,
 } from 'recoil';
 import { executeUpdater } from './utils';
@@ -43,6 +44,10 @@ export type RecoilDialogSetters<T> = Readonly<{
    * `meta` property setter.
    */
   setMeta: SetterOrUpdater<T>;
+  /**
+   * Resets dialog state to initial. Done through `useResetRecoilState`.
+   */
+  reset: () => void;
 }>;
 
 /**
@@ -82,6 +87,7 @@ export const useRecoilDialog = <T>(
   recoilDialogState: RecoilState<RecoilDialogState<T>>
 ): UseRecoilDialogResult<T> => {
   const [state, setState] = useRecoilState(recoilDialogState);
+  const reset = useResetRecoilState(recoilDialogState);
 
   const setOpen = React.useCallback<RecoilDialogSetters<T>['setOpen']>(
     (valOrUpdater) => {
@@ -128,6 +134,7 @@ export const useRecoilDialog = <T>(
       open,
       close,
       setMeta,
+      reset,
     },
   ];
 };

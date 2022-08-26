@@ -4,6 +4,7 @@ import {
   RecoilState,
   AtomOptions,
   useRecoilState,
+  useResetRecoilState,
   SetterOrUpdater,
 } from 'recoil';
 import { executeUpdater } from './utils';
@@ -55,6 +56,10 @@ export type RecoilPaginationSetters<T> = Readonly<{
    * `meta` property setter.
    */
   setMeta: SetterOrUpdater<T>;
+  /**
+   * Resets pagination state to initial. Done through `useResetRecoilState`.
+   */
+  reset: () => void;
 }>;
 
 /**
@@ -97,6 +102,7 @@ export const useRecoilPagination = <T>(
   recoilPaginationState: RecoilState<RecoilPaginationState<T>>
 ): UseRecoilPaginationResult<T> => {
   const [state, setState] = useRecoilState(recoilPaginationState);
+  const reset = useResetRecoilState(recoilPaginationState);
 
   const setTotal = React.useCallback<RecoilPaginationSetters<T>['setTotal']>(
     (valOrUpdater) => {
@@ -155,6 +161,7 @@ export const useRecoilPagination = <T>(
       setPage,
       setLimit,
       setMeta,
+      reset,
     },
   ];
 };

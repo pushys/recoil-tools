@@ -5,6 +5,7 @@ import {
   AtomOptions,
   useRecoilState,
   useRecoilValue,
+  useResetRecoilState,
   SetterOrUpdater,
 } from 'recoil';
 import { executeUpdater } from './utils';
@@ -52,6 +53,10 @@ export type RecoilFiltersSetters<T extends Record<string, any>> = Readonly<{
    * and `isApplied` property to `true`.
    */
   apply: SetterOrUpdater<T>;
+  /**
+   * Resets filters state to initial. Done through `useResetRecoilState`.
+   */
+  reset: () => void;
 }>;
 
 /**
@@ -92,6 +97,7 @@ export const useRecoilFilters = <T extends Record<string, any>>(
   recoilFiltersState: RecoilState<RecoilFiltersState<T>>
 ): UseRecoilFiltersResult<T> => {
   const [state, setState] = useRecoilState(recoilFiltersState);
+  const reset = useResetRecoilState(recoilFiltersState);
 
   const setOpen = React.useCallback<RecoilFiltersSetters<T>['setOpen']>(
     (valOrUpdater) => {
@@ -142,6 +148,7 @@ export const useRecoilFilters = <T extends Record<string, any>>(
       open,
       close,
       apply,
+      reset,
     },
   ];
 };

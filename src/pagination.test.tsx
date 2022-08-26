@@ -259,4 +259,40 @@ describe('Recoil Pagination', () => {
       meta: 'metadata',
     });
   });
+
+  it('should reset pagination state', () => {
+    const atom = paginationAtom<string>({
+      key: `pagination${key}`,
+      default: {
+        total: 0,
+        page: 1,
+        limit: 10,
+        offset: 0,
+        meta: 'meta',
+      },
+    });
+
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <RecoilRoot>{children}</RecoilRoot>
+    );
+    const { result } = renderHook(() => useRecoilPagination(atom), {
+      wrapper,
+    });
+
+    act(() => {
+      result.current[1].setMeta('metas');
+      result.current[1].setTotal(211);
+      result.current[1].setPage(31);
+      result.current[1].setLimit(3);
+      result.current[1].reset();
+    });
+
+    expect(result.current[0]).toMatchObject({
+      total: 0,
+      page: 1,
+      limit: 10,
+      offset: 0,
+      meta: 'meta',
+    });
+  });
 });
