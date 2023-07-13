@@ -9,7 +9,12 @@
   "author": "Eugene Dyakonov <evgeny.dknv@gmail.com>",
   "type": "module",
   "source": "src/index.ts",
-  "exports": "./dist/index.modern.js",
+  "exports": {
+    "types": "./dist/index.d.ts",
+    "import": "./dist/index.modern.js",
+    "require": "./dist/index.cjs",
+    "default": "./dist/index.modern.js"
+  },
   "main": "./dist/index.cjs",
   "module": "./dist/index.module.js",
   "unpkg": "./dist/index.umd.js",
