@@ -3,10 +3,12 @@ import {
   atom,
   RecoilState,
   AtomOptions,
-  useRecoilState,
-  useResetRecoilState,
   SetterOrUpdater,
+  useRecoilValue,
+  useSetRecoilState,
+  useResetRecoilState,
 } from 'recoil';
+
 import { executeUpdater } from './utils';
 
 /**
@@ -101,7 +103,24 @@ export const paginationAtom = <T>(
 export const useRecoilPagination = <T>(
   recoilPaginationState: RecoilState<RecoilPaginationState<T>>
 ): UseRecoilPaginationResult<T> => {
-  const [state, setState] = useRecoilState(recoilPaginationState);
+  const state = useRecoilValue(recoilPaginationState);
+  const setters = useRecoilPaginationSetters(recoilPaginationState);
+
+  return [state, setters];
+};
+
+/**
+ * Extracts only pagination state setters.
+ *
+ * @param recoilPaginationState - Recoil Pagination state.
+ *
+ * @example
+ * const { setTotal, setPage } = useRecoilPaginationSetters(paginationState);
+ */
+export const useRecoilPaginationSetters = <T>(
+  recoilPaginationState: RecoilState<RecoilPaginationState<T>>
+): RecoilPaginationSetters<T> => {
+  const setState = useSetRecoilState(recoilPaginationState);
   const reset = useResetRecoilState(recoilPaginationState);
 
   const setTotal = React.useCallback<RecoilPaginationSetters<T>['setTotal']>(
@@ -154,29 +173,11 @@ export const useRecoilPagination = <T>(
     [setState]
   );
 
-  return [
-    state,
-    {
-      setTotal,
-      setPage,
-      setLimit,
-      setMeta,
-      reset,
-    },
-  ];
-};
-
-/**
- * Extracts only pagination state setters.
- *
- * @param recoilPaginationState - Recoil Pagination state.
- *
- * @example
- * const { setTotal, setPage } = useRecoilPaginationSetters(paginationState);
- */
-export const useRecoilPaginationSetters = <T>(
-  recoilPaginationState: RecoilState<RecoilPaginationState<T>>
-): RecoilPaginationSetters<T> => {
-  const [, setters] = useRecoilPagination<T>(recoilPaginationState);
-  return setters;
+  return {
+    setTotal,
+    setPage,
+    setLimit,
+    setMeta,
+    reset,
+  };
 };

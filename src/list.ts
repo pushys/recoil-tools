@@ -3,11 +3,12 @@ import {
   atom,
   RecoilState,
   AtomOptions,
-  useRecoilState,
-  useRecoilValue,
-  useResetRecoilState,
   SetterOrUpdater,
+  useRecoilValue,
+  useSetRecoilState,
+  useResetRecoilState,
 } from 'recoil';
+
 import { executeUpdater } from './utils';
 
 /**
@@ -141,7 +142,54 @@ export const listAtom = <T, U>(
 export const useRecoilList = <T, U>(
   recoilListState: RecoilState<RecoilListState<T, U>>
 ): UseRecoilListResult<T, U> => {
-  const [state, setState] = useRecoilState(recoilListState);
+  const state = useRecoilValue(recoilListState);
+  const setters = useRecoilListSetters(recoilListState);
+
+  return [state, setters];
+};
+
+/**
+ * Returns only `data` property from the list state.
+ *
+ * @param recoilListState - Recoil List state.
+ *
+ * @example
+ * const data = useRecoilListData(listState);
+ */
+export const useRecoilListData = <T>(
+  recoilListState: RecoilState<RecoilListState<T, any>>
+): T[] => {
+  const state = useRecoilValue<RecoilListState<T, any>>(recoilListState);
+  return state.data;
+};
+
+/**
+ * Returns only `meta` property from the list state.
+ *
+ * @param recoilListState - Recoil List state.
+ *
+ * @example
+ * const meta = useRecoilListMeta(listState);
+ */
+export const useRecoilListMeta = <T>(
+  recoilListState: RecoilState<RecoilListState<any, T>>
+): T => {
+  const state = useRecoilValue<RecoilListState<any, T>>(recoilListState);
+  return state.meta;
+};
+
+/**
+ * Returns only list state setters.
+ *
+ * @param recoilListState - Recoil List state.
+ *
+ * @example
+ * const { push, update } = useRecoilListSetters(listState);
+ */
+export const useRecoilListSetters = <T, U>(
+  recoilListState: RecoilState<RecoilListState<T, U>>
+): RecoilListSetters<T, U> => {
+  const setState = useSetRecoilState(recoilListState);
   const reset = useResetRecoilState(recoilListState);
 
   const setData = React.useCallback<RecoilListSetters<T, U>['setData']>(
@@ -306,73 +354,25 @@ export const useRecoilList = <T, U>(
     [setState]
   );
 
-  return [
-    state,
-    {
-      setData,
-      setMeta,
-      clearData,
-      unshift,
-      push,
-      clearPush,
-      upsert,
-      updateAt,
-      update,
-      updateAll,
-      removeAt,
-      remove,
-      removeAll,
-      filter,
-      sort,
-      reverse,
-      reset,
-    },
-  ];
-};
-
-/**
- * Returns only `data` property from the list state.
- *
- * @param recoilListState - Recoil List state.
- *
- * @example
- * const data = useRecoilListData(listState);
- */
-export const useRecoilListData = <T>(
-  recoilListState: RecoilState<RecoilListState<T, any>>
-): T[] => {
-  const state = useRecoilValue<RecoilListState<T, any>>(recoilListState);
-  return state.data;
-};
-
-/**
- * Returns only `meta` property from the list state.
- *
- * @param recoilListState - Recoil List state.
- *
- * @example
- * const meta = useRecoilListMeta(listState);
- */
-export const useRecoilListMeta = <T>(
-  recoilListState: RecoilState<RecoilListState<any, T>>
-): T => {
-  const state = useRecoilValue<RecoilListState<any, T>>(recoilListState);
-  return state.meta;
-};
-
-/**
- * Returns only list state setters.
- *
- * @param recoilListState - Recoil List state.
- *
- * @example
- * const { push, update } = useRecoilListSetters(listState);
- */
-export const useRecoilListSetters = <T, U>(
-  recoilListState: RecoilState<RecoilListState<T, U>>
-): RecoilListSetters<T, U> => {
-  const [, setters] = useRecoilList<T, U>(recoilListState);
-  return setters;
+  return {
+    setData,
+    setMeta,
+    clearData,
+    unshift,
+    push,
+    clearPush,
+    upsert,
+    updateAt,
+    update,
+    updateAll,
+    removeAt,
+    remove,
+    removeAll,
+    filter,
+    sort,
+    reverse,
+    reset,
+  };
 };
 
 /**
