@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.3] - 2023-08-02
+
+### Changed
+
+- [General] Setters-only hooks do not trigger component re-render anymore.
+
 ## [2.0.2] - 2023-07-13
 
 ### Changed

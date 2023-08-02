@@ -3,11 +3,12 @@ import {
   atom,
   RecoilState,
   AtomOptions,
-  useRecoilState,
-  useRecoilValue,
-  useResetRecoilState,
   SetterOrUpdater,
+  useRecoilValue,
+  useSetRecoilState,
+  useResetRecoilState,
 } from 'recoil';
+
 import { executeUpdater } from './utils';
 
 /**
@@ -86,57 +87,10 @@ export const dialogAtom = <T>(
 export const useRecoilDialog = <T>(
   recoilDialogState: RecoilState<RecoilDialogState<T>>
 ): UseRecoilDialogResult<T> => {
-  const [state, setState] = useRecoilState(recoilDialogState);
-  const reset = useResetRecoilState(recoilDialogState);
+  const state = useRecoilValue(recoilDialogState);
+  const setters = useRecoilDialogSetters(recoilDialogState);
 
-  const setOpen = React.useCallback<RecoilDialogSetters<T>['setOpen']>(
-    (valOrUpdater) => {
-      setState((prevState) => ({
-        ...prevState,
-        isOpen: executeUpdater(valOrUpdater, prevState.isOpen),
-      }));
-    },
-    [setState]
-  );
-
-  const open = React.useCallback<RecoilDialogSetters<T>['open']>(
-    (meta) => {
-      setState((prevState) => ({
-        ...prevState,
-        ...(meta !== undefined && { meta }),
-        isOpen: true,
-      }));
-    },
-    [setState]
-  );
-
-  const close = React.useCallback<RecoilDialogSetters<T>['close']>(() => {
-    setState((prevState) => ({
-      ...prevState,
-      isOpen: false,
-    }));
-  }, [setState]);
-
-  const setMeta = React.useCallback<RecoilDialogSetters<T>['setMeta']>(
-    (valOrUpdater) => {
-      setState((prevState) => ({
-        ...prevState,
-        meta: executeUpdater(valOrUpdater, prevState.meta),
-      }));
-    },
-    [setState]
-  );
-
-  return [
-    state,
-    {
-      setOpen,
-      open,
-      close,
-      setMeta,
-      reset,
-    },
-  ];
+  return [state, setters];
 };
 
 /**
@@ -180,6 +134,46 @@ export const useRecoilDialogMeta = <T>(
 export const useRecoilDialogSetters = <T>(
   recoilDialogState: RecoilState<RecoilDialogState<T>>
 ): RecoilDialogSetters<T> => {
-  const [, setters] = useRecoilDialog<T>(recoilDialogState);
-  return setters;
+  const setState = useSetRecoilState(recoilDialogState);
+  const reset = useResetRecoilState(recoilDialogState);
+
+  const setOpen = React.useCallback<RecoilDialogSetters<T>['setOpen']>(
+    (valOrUpdater) => {
+      setState((prevState) => ({
+        ...prevState,
+        isOpen: executeUpdater(valOrUpdater, prevState.isOpen),
+      }));
+    },
+    [setState]
+  );
+
+  const open = React.useCallback<RecoilDialogSetters<T>['open']>(
+    (meta) => {
+      setState((prevState) => ({
+        ...prevState,
+        ...(meta !== undefined && { meta }),
+        isOpen: true,
+      }));
+    },
+    [setState]
+  );
+
+  const close = React.useCallback<RecoilDialogSetters<T>['close']>(() => {
+    setState((prevState) => ({
+      ...prevState,
+      isOpen: false,
+    }));
+  }, [setState]);
+
+  const setMeta = React.useCallback<RecoilDialogSetters<T>['setMeta']>(
+    (valOrUpdater) => {
+      setState((prevState) => ({
+        ...prevState,
+        meta: executeUpdater(valOrUpdater, prevState.meta),
+      }));
+    },
+    [setState]
+  );
+
+  return { setOpen, open, close, setMeta, reset };
 };

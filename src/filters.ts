@@ -3,11 +3,12 @@ import {
   atom,
   RecoilState,
   AtomOptions,
-  useRecoilState,
-  useRecoilValue,
-  useResetRecoilState,
   SetterOrUpdater,
+  useRecoilValue,
+  useSetRecoilState,
+  useResetRecoilState,
 } from 'recoil';
+
 import { executeUpdater } from './utils';
 
 /**
@@ -96,61 +97,10 @@ export const filtersAtom = <T extends Record<string, any>>(
 export const useRecoilFilters = <T extends Record<string, any>>(
   recoilFiltersState: RecoilState<RecoilFiltersState<T>>
 ): UseRecoilFiltersResult<T> => {
-  const [state, setState] = useRecoilState(recoilFiltersState);
-  const reset = useResetRecoilState(recoilFiltersState);
+  const state = useRecoilValue(recoilFiltersState);
+  const setters = useRecoilFiltersSetters(recoilFiltersState);
 
-  const setOpen = React.useCallback<RecoilFiltersSetters<T>['setOpen']>(
-    (valOrUpdater) => {
-      setState((prevState) => ({
-        ...prevState,
-        isOpen: executeUpdater(valOrUpdater, prevState.isOpen),
-      }));
-    },
-    [setState]
-  );
-
-  const setApplied = React.useCallback<RecoilFiltersSetters<T>['setApplied']>(
-    (valOrUpdater) => {
-      setState((prevState) => ({
-        ...prevState,
-        isApplied: executeUpdater(valOrUpdater, prevState.isApplied),
-      }));
-    },
-    [setState]
-  );
-
-  const open = React.useCallback<RecoilFiltersSetters<T>['open']>(
-    () => setOpen(true),
-    [setOpen]
-  );
-
-  const close = React.useCallback<RecoilFiltersSetters<T>['close']>(
-    () => setOpen(false),
-    [setOpen]
-  );
-
-  const apply = React.useCallback<RecoilFiltersSetters<T>['apply']>(
-    (valOrUpdater) => {
-      setState((prevState) => ({
-        ...prevState,
-        isApplied: true,
-        values: executeUpdater(valOrUpdater, prevState.values),
-      }));
-    },
-    [setState]
-  );
-
-  return [
-    state,
-    {
-      setOpen,
-      setApplied,
-      open,
-      close,
-      apply,
-      reset,
-    },
-  ];
+  return [state, setters];
 };
 
 /**
@@ -209,6 +159,49 @@ export const useRecoilFiltersValues = <T extends Record<string, any>>(
 export const useRecoilFiltersSetters = <T extends Record<string, any>>(
   recoilFiltersState: RecoilState<RecoilFiltersState<T>>
 ): RecoilFiltersSetters<T> => {
-  const [, setters] = useRecoilFilters<T>(recoilFiltersState);
-  return setters;
+  const setState = useSetRecoilState(recoilFiltersState);
+  const reset = useResetRecoilState(recoilFiltersState);
+
+  const setOpen = React.useCallback<RecoilFiltersSetters<T>['setOpen']>(
+    (valOrUpdater) => {
+      setState((prevState) => ({
+        ...prevState,
+        isOpen: executeUpdater(valOrUpdater, prevState.isOpen),
+      }));
+    },
+    [setState]
+  );
+
+  const setApplied = React.useCallback<RecoilFiltersSetters<T>['setApplied']>(
+    (valOrUpdater) => {
+      setState((prevState) => ({
+        ...prevState,
+        isApplied: executeUpdater(valOrUpdater, prevState.isApplied),
+      }));
+    },
+    [setState]
+  );
+
+  const open = React.useCallback<RecoilFiltersSetters<T>['open']>(
+    () => setOpen(true),
+    [setOpen]
+  );
+
+  const close = React.useCallback<RecoilFiltersSetters<T>['close']>(
+    () => setOpen(false),
+    [setOpen]
+  );
+
+  const apply = React.useCallback<RecoilFiltersSetters<T>['apply']>(
+    (valOrUpdater) => {
+      setState((prevState) => ({
+        ...prevState,
+        isApplied: true,
+        values: executeUpdater(valOrUpdater, prevState.values),
+      }));
+    },
+    [setState]
+  );
+
+  return { setOpen, setApplied, open, close, apply, reset };
 };
